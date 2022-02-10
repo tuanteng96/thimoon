@@ -265,116 +265,120 @@ export default class extends React.Component {
                   {!isLoading && (
                     <div className="page-shop__service-list">
                       {arrService && arrService.length > 0 ? (
-                        arrService.map((item, index) => (
-                          <div
-                            className="page-shop__service-item"
-                            key={item.root.ID}
-                          >
-                            <div className="page-shop__service-item service-about">
-                              <div className="service-about__img">
-                                <img
-                                  src={
-                                    SERVER_APP +
-                                    "/Upload/image/" +
-                                    item.root.Thumbnail
-                                  }
-                                  alt={item.root.Title}
-                                />
-                              </div>
-                              {item.root.Desc !== "" ? (
-                                <div className="service-about__content">
-                                  <div className="service-about__content-text">
-                                    {ReactHtmlParser(item.root.Desc)}
-                                  </div>
-                                  <Button
-                                    fill
-                                    sheetOpen={`.demo-sheet-${item.root.ID}`}
-                                    className="show-more"
-                                  >
-                                    Chi tiết{" "}
-                                    <i className="las la-angle-right"></i>
-                                  </Button>
-                                  <Sheet
-                                    opened={Number(idOpen) === item.root.ID}
-                                    className={`demo-sheet-${item.root.ID} sheet-detail`}
-                                    style={{
-                                      height: "auto",
-                                      "--f7-sheet-bg-color": "#fff",
-                                    }}
-                                    //swipeToClose
-                                    backdrop
-                                  >
+                        arrService
+                          .filter((o) => o.items.length > 0)
+                          .map((item, index) => (
+                            <div
+                              className="page-shop__service-item"
+                              key={item.root.ID}
+                            >
+                              <div className="page-shop__service-item service-about">
+                                <div className="service-about__img">
+                                  <img
+                                    src={
+                                      SERVER_APP +
+                                      "/Upload/image/" +
+                                      item.root.Thumbnail
+                                    }
+                                    alt={item.root.Title}
+                                  />
+                                </div>
+                                {item.root.Desc !== "" ? (
+                                  <div className="service-about__content">
+                                    <div className="service-about__content-text">
+                                      {ReactHtmlParser(item.root.Desc)}
+                                    </div>
                                     <Button
-                                      sheetClose={`.demo-sheet-${item.root.ID}`}
+                                      fill
+                                      sheetOpen={`.demo-sheet-${item.root.ID}`}
                                       className="show-more"
                                     >
-                                      <i className="las la-times"></i>
+                                      Chi tiết{" "}
+                                      <i className="las la-angle-right"></i>
                                     </Button>
-                                    <PageContent>
-                                      <div className="page-shop__service-detail">
-                                        <div className="title">
-                                          <h4>{item.root.Title}</h4>
+                                    <Sheet
+                                      opened={Number(idOpen) === item.root.ID}
+                                      className={`demo-sheet-${item.root.ID} sheet-detail`}
+                                      style={{
+                                        height: "auto",
+                                        "--f7-sheet-bg-color": "#fff",
+                                      }}
+                                      //swipeToClose
+                                      backdrop
+                                    >
+                                      <Button
+                                        sheetClose={`.demo-sheet-${item.root.ID}`}
+                                        className="show-more"
+                                      >
+                                        <i className="las la-times"></i>
+                                      </Button>
+                                      <PageContent>
+                                        <div className="page-shop__service-detail">
+                                          <div className="title">
+                                            <h4>{item.root.Title}</h4>
+                                          </div>
+                                          <div className="content">
+                                            {ReactHtmlParser(item.root.Desc)}
+                                            {ReactHtmlParser(item.root.Detail)}
+                                          </div>
                                         </div>
-                                        <div className="content">
-                                          {ReactHtmlParser(item.root.Desc)}
-                                          {ReactHtmlParser(item.root.Detail)}
-                                        </div>
-                                      </div>
-                                    </PageContent>
-                                  </Sheet>
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                              <div className="service-about__list">
-                                <ul>
-                                  {item.items.map((subitem) => (
-                                    <li key={subitem.ID}>
-                                      <Link href={"/shop/detail/" + subitem.ID}>
-                                        <div className="title">
-                                          {subitem.Title}
-                                        </div>
-                                        <div
-                                          className={
-                                            "price " +
-                                            (subitem.IsDisplayPrice !== 0 &&
-                                            checkSale(
-                                              subitem.SaleBegin,
-                                              subitem.SaleEnd
-                                            ) === true
-                                              ? "sale"
-                                              : "")
-                                          }
+                                      </PageContent>
+                                    </Sheet>
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                                <div className="service-about__list">
+                                  <ul>
+                                    {item.items.map((subitem) => (
+                                      <li key={subitem.ID}>
+                                        <Link
+                                          href={"/shop/detail/" + subitem.ID}
                                         >
-                                          {subitem.IsDisplayPrice === 0 ? (
-                                            <span className="price-to">
-                                              Liên hệ
-                                            </span>
-                                          ) : (
-                                            <React.Fragment>
+                                          <div className="title">
+                                            {subitem.Title}
+                                          </div>
+                                          <div
+                                            className={
+                                              "price " +
+                                              (subitem.IsDisplayPrice !== 0 &&
+                                              checkSale(
+                                                subitem.SaleBegin,
+                                                subitem.SaleEnd
+                                              ) === true
+                                                ? "sale"
+                                                : "")
+                                            }
+                                          >
+                                            {subitem.IsDisplayPrice === 0 ? (
                                               <span className="price-to">
-                                                {formatPriceVietnamese(
-                                                  subitem.PriceProduct
-                                                )}
-                                                <b>đ</b>
+                                                Liên hệ
                                               </span>
-                                              <span className="price-sale">
-                                                {formatPriceVietnamese(
-                                                  subitem.PriceSale
-                                                )}
-                                                <b>đ</b>
-                                              </span>
-                                            </React.Fragment>
-                                          )}
-                                        </div>
-                                      </Link>
-                                    </li>
-                                  ))}
-                                </ul>
+                                            ) : (
+                                              <React.Fragment>
+                                                <span className="price-to">
+                                                  {formatPriceVietnamese(
+                                                    subitem.PriceProduct
+                                                  )}
+                                                  <b>đ</b>
+                                                </span>
+                                                <span className="price-sale">
+                                                  {formatPriceVietnamese(
+                                                    subitem.PriceSale
+                                                  )}
+                                                  <b>đ</b>
+                                                </span>
+                                              </React.Fragment>
+                                            )}
+                                          </div>
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))
+                          ))
                       ) : (
                         <PageNoData text="Không có dịch vụ." />
                       )}
