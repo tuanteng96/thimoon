@@ -26,7 +26,7 @@ export default class ListImage extends React.Component {
         this.setState({
           arrPhotoCustomer: arrPhotoCustomer,
           PhotoCustomerActive: arrPhotoCustomer[0],
-          isActivePhoto: arrPhotoCustomer[0].ID,
+          isActivePhoto: arrPhotoCustomer[0]?.ID,
           isLoading: false,
         });
       })

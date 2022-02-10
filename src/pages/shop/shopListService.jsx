@@ -19,6 +19,7 @@ import ToolBarBottom from "../../components/ToolBarBottom";
 import _ from "lodash";
 import SkeletonListService from "./components/Skeleton/SkeletonListService";
 import CategoriesList from "./components/CategoriesList/CategoriesList/CategoriesList";
+import PageNoData from "../../components/PageNoData";
 
 export default class extends React.Component {
   constructor(props) {
@@ -34,23 +35,42 @@ export default class extends React.Component {
       currentId: 0,
       keySearch: "",
       idOpen: null,
+      Pi: 1,
+      Ps: 2,
+      Count: 0,
+      showPreloader: false,
     };
 
     this.delayedCallback = _.debounce(this.inputCallback, 400);
   }
   getService = (id) => {
+    var $$ = this.Dom7;
+    var container = $$(".page-content");
+    container.scrollTop(0, 300);
+
+    const { Pi, Ps } = this.state;
     const CateID = id || this.$f7route.params.cateId;
     let stockid = getStockIDStorage();
     stockid ? stockid : 0;
     this.setState({
       isLoading: true,
     });
-    ShopDataService.getServiceParent(CateID, stockid)
-      .then((response) => {
-        const arrServiceParent = response.data.data;
+
+    const filters = {
+      ID: CateID,
+      Pi: Pi,
+      Ps: Ps,
+      StockID: stockid,
+    };
+
+    ShopDataService.getServiceParent2(filters)
+      .then(({ data }) => {
+        const { lst, pcount, pi } = data;
         this.setState({
-          arrService: arrServiceParent,
+          arrService: lst,
           isLoading: false,
+          Count: pcount,
+          Pi: pi,
         });
       })
       .catch((e) => console.log(e));
@@ -123,7 +143,7 @@ export default class extends React.Component {
     });
   };
 
-  loadMore(done) {
+  loadRefresh(done) {
     const self = this;
     const { CateID, currentId, keySearch, isSearch } = this.state;
     setTimeout(() => {
@@ -138,9 +158,42 @@ export default class extends React.Component {
   }
 
   changeCate = (cate) => {
-    this.setState({ currentId: cate.ID, idOpen: "" });
+    this.setState({ currentId: cate.ID, idOpen: "", Pi: 1, Count: 0 });
     this.getService(cate.ID);
     this.getTitleCate(cate.ID);
+  };
+
+  loadMoreAsync = () => {
+    const { arrService, Count, Pi, Ps, currentId, showPreloader } = this.state;
+    if (Pi >= Count) {
+      return false;
+    }
+    if (showPreloader) return false;
+    this.setState({ showPreloader: true });
+    const CateID = currentId || this.$f7route.params.cateId;
+    let stockid = getStockIDStorage();
+    stockid ? stockid : 0;
+
+    const filters = {
+      ID: CateID,
+      Pi: Pi + 1,
+      Ps: Ps,
+      StockID: stockid,
+    };
+
+    ShopDataService.getServiceParent2(filters)
+      .then(({ data }) => {
+        const { lst, pcount, pi } = data;
+        const arrServiceNew = [...arrService, ...lst];
+        this.setState({
+          arrService: arrServiceNew,
+          isLoading: false,
+          Count: pcount,
+          showPreloader: false,
+          Pi: pi,
+        });
+      })
+      .catch((e) => console.log(e));
   };
 
   render() {
@@ -152,6 +205,7 @@ export default class extends React.Component {
       CateID,
       currentId,
       idOpen,
+      showPreloader,
     } = this.state;
 
     return (
@@ -160,7 +214,11 @@ export default class extends React.Component {
         onPageBeforeOut={this.onPageBeforeOut.bind(this)}
         onPageBeforeRemove={this.onPageBeforeRemove.bind(this)}
         ptr
-        onPtrRefresh={this.loadMore.bind(this)}
+        infinite
+        infiniteDistance={50}
+        infinitePreloader={showPreloader}
+        onPtrRefresh={this.loadRefresh.bind(this)}
+        onInfinite={() => this.loadMoreAsync()}
       >
         <Navbar>
           <div className="page-navbar">
@@ -206,7 +264,7 @@ export default class extends React.Component {
                   {isLoading && <SkeletonListService />}
                   {!isLoading && (
                     <div className="page-shop__service-list">
-                      {arrService &&
+                      {arrService && arrService.length > 0 ? (
                         arrService.map((item, index) => (
                           <div
                             className="page-shop__service-item"
@@ -316,7 +374,10 @@ export default class extends React.Component {
                               </div>
                             </div>
                           </div>
-                        ))}
+                        ))
+                      ) : (
+                        <PageNoData text="Không có dịch vụ." />
+                      )}
                     </div>
                   )}
                 </>

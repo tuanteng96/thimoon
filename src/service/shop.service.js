@@ -22,6 +22,9 @@ class ShopDataService {
     getServiceParent(id, stock) {
         return http.get(`/api/v3/app2?get=sv&cid=${id}&stockid=${stock}&takes=detail,desc`);
     }
+    getServiceParent2(filters) {
+        return http.get(`/thimoong-sv.aspx?get=sv&cid=${filters.ID}&stockid=${filters.StockID}&takes=detail,desc&&pi=${filters.Pi}&ps=${filters.Ps}`);
+    }
     getServiceParentID(id, stockid) {
         return http.get(`/app/index.aspx?cmd=service_parentid&id=${id}&stockid=${stockid}`);
     }
