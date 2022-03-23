@@ -147,12 +147,12 @@ export default class extends React.Component {
     const self = this;
     const { CateID, currentId, keySearch, isSearch } = this.state;
     setTimeout(() => {
+      this.setState({ idOpen: "", Pi: 1 });
       if (isSearch) {
         self.delayedCallback(keySearch);
       } else {
         self.getService(currentId || CateID);
       }
-      this.setState({ idOpen: "" });
       done();
     }, 1000);
   }
